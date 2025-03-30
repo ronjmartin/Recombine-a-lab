@@ -1,17 +1,21 @@
 name: Deploy PDF Analysis Dashboard
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     
     - name: Set up Python 3.11
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.11
         
@@ -61,7 +65,7 @@ jobs:
                 <div class="step">
                     <h3>1. Download the Code</h3>
                     <p>Clone or download this repository to your local machine.</p>
-                    <code>git clone https://github.com/${{ github.repository }}.git</code>
+                    <code>git clone https://github.com/\${GITHUB_REPOSITORY}.git</code>
                 </div>
                 
                 <div class="step">
@@ -95,7 +99,6 @@ jobs:
         EOL
     
     - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@4.1.4
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
-        branch: gh-pages
         folder: deploy
