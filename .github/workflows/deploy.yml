@@ -1,30 +1,101 @@
 name: Deploy PDF Analysis Dashboard
-
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    
     - name: Set up Python 3.11
       uses: actions/setup-python@v2
       with:
         python-version: 3.11
+        
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -e .
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
     - name: Run tests
       run: |
         # Add tests if you have them
         echo "No tests yet"
-    - name: Build static files
+    
+    - name: Create deployment files
       run: |
-        # If you need to build any static files
-        echo "No static files to build"
+        # Create a simple index.html that redirects to the Streamlit app
+        mkdir -p deploy
+        cp -r *.py deploy/
+        cp -r .streamlit deploy/ || true
+        cp -r templates deploy/ || true
+        cp requirements.txt deploy/
+        cp runtime.txt deploy/ || true
+        cp Procfile deploy/ || true
+        
+        # Create index.html to provide instructions
+        cat > deploy/index.html << EOL
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>PDF Analysis Dashboard</title>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+                .container { border: 1px solid #ddd; padding: 20px; border-radius: 5px; }
+                h1 { color: #333; }
+                .step { margin-bottom: 15px; }
+                code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; }
+                .note { background: #ffffd9; padding: 10px; border-left: 4px solid #ffd700; margin: 15px 0; }
+            </style>
+        </head>
+        <body>
+            <h1>PDF Analysis Dashboard</h1>
+            <div class="container">
+                <h2>How to Run This Application</h2>
+                <p>This is a Streamlit application for PDF analysis. To run it:</p>
+                
+                <div class="step">
+                    <h3>1. Download the Code</h3>
+                    <p>Clone or download this repository to your local machine.</p>
+                    <code>git clone https://github.com/${{ github.repository }}.git</code>
+                </div>
+                
+                <div class="step">
+                    <h3>2. Install Requirements</h3>
+                    <p>Install the required Python packages:</p>
+                    <code>pip install -r requirements.txt</code>
+                </div>
+                
+                <div class="step">
+                    <h3>3. Run the Application</h3>
+                    <p>Start the Streamlit server:</p>
+                    <code>streamlit run basic_app.py</code>
+                </div>
+                
+                <div class="note">
+                    <p><strong>Note:</strong> This application must be run locally as Streamlit requires a live server.</p>
+                </div>
+            </div>
+            
+            <div class="container" style="margin-top: 20px;">
+                <h2>Features</h2>
+                <ul>
+                    <li>PDF text and table extraction</li>
+                    <li>Sentiment analysis of document content</li>
+                    <li>Key findings extraction</li>
+                    <li>Knowledge base for storing and retrieving analyzed documents</li>
+                </ul>
+            </div>
+        </body>
+        </html>
+        EOL
+    
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@4.1.4
+      with:
+        branch: gh-pages
+        folder: deploy
