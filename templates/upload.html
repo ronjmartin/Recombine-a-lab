@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Upload & Analyze PDF - PDF Analysis Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Upload & Analyze PDF</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Upload PDF Document</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="pdf_file" class="form-label">Select PDF file</label>
+                    <input type="file" class="form-control" id="pdf_file" name="pdf_file" accept=".pdf" required>
+                    <div class="form-text">Max file size: 10MB</div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-upload"></i> Upload & Analyze
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">What will be analyzed?</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Text Content</h6>
+                    <p>The textual content of your PDF will be extracted and displayed.</p>
+                    
+                    <h6>Tables</h6>
+                    <p>Any tables found in the PDF will be extracted and presented in a tabular format.</p>
+                </div>
+                <div class="col-md-6">
+                    <h6>Sentiment Analysis</h6>
+                    <p>The emotional tone of the text will be analyzed, including sentiment polarity and subjectivity.</p>
+                    
+                    <h6>Key Findings</h6>
+                    <p>Important entities, key topics, and a summary will be generated from the document content.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

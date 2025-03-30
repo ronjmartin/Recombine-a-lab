@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Results - PDF Analysis Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Analysis Results</h1>
+        <div>
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#saveToKbModal">
+                <i class="bi bi-save"></i> Save to Knowledge Base
+            </button>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">File Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>File Name:</strong> {{ file_details.FileName }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>File Type:</strong> {{ file_details.FileType }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>File Size:</strong> {{ file_details.FileSize }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Sentiment Analysis</h5>
+                    <span class="badge bg-{{ 'success' if sentiment.polarity > 0 else 'danger' if sentiment.polarity < 0 else 'secondary' }}">
+                        {{ 'Positive' if sentiment.polarity > 0 else 'Negative' if sentiment.polarity < 0 else 'Neutral' }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Sentiment Score: {{ '%.2f'|format(sentiment.polarity) }}</h6>
+                        <div class="progress">
+                            <div class="progress-bar {{ 'bg-success' if sentiment.polarity > 0 else 'bg-danger' if sentiment.polarity < 0 else 'bg-secondary' }}" 
+                                 role="progressbar" 
+                                 style="width: {{ (sentiment.polarity + 1) * 50 }}%"
+                                 aria-valuenow="{{ (sentiment.polarity + 1) * 50 }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                        <small class="text-muted">(-1: Very Negative, 0: Neutral, 1: Very Positive)</small>
+                    </div>
+                    
+                    <div>
+                        <h6>Subjectivity: {{ '%.2f'|format(sentiment.subjectivity) }}</h6>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" 
+                                 role="progressbar" 
+                                 style="width: {{ sentiment.subjectivity * 100 }}%" 
+                                 aria-valuenow="{{ sentiment.subjectivity * 100 }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                        <small class="text-muted">(0: Very Objective, 1: Very Subjective)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Key Findings</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Key Topics</h6>
+                    <div class="mb-3">
+                        {% if key_findings.topics %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for topic in key_findings.topics %}
+                                    <span class="badge bg-primary">{{ topic }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No topics identified</p>
+                        {% endif %}
+                    </div>
+                    
+                    <h6>Key Entities</h6>
+                    <div class="mb-3">
+                        {% if key_findings.entities %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for entity in key_findings.entities %}
+                                    <span class="badge bg-secondary">{{ entity.text }} ({{ entity.label }})</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No entities identified</p>
+                        {% endif %}
+                    </div>
+                    
+                    <h6>Summary</h6>
+                    <div>
+                        {% if key_findings.summary %}
+                            <p>{{ key_findings.summary }}</p>
+                        {% else %}
+                            <p class="text-muted">No summary available</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="contentTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text-content" type="button" role="tab" aria-controls="text-content" aria-selected="true">
+                        Text Content
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tables-tab" data-bs-toggle="tab" data-bs-target="#tables-content" type="button" role="tab" aria-controls="tables-content" aria-selected="false">
+                        Tables
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="contentTabsContent">
+                <div class="tab-pane fade show active" id="text-content" role="tabpanel" aria-labelledby="text-tab">
+                    <div class="mb-3">
+                        <div class="text-content" style="max-height: 500px; overflow-y: auto; white-space: pre-wrap;">{{ text_content }}</div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tables-content" role="tabpanel" aria-labelledby="tables-tab">
+                    {% if tables %}
+                        {% for table in tables %}
+                            <div class="table-responsive mb-4">
+                                <h6>Table {{ loop.index }}</h6>
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            {% for col in table.columns %}
+                                                <th>{{ col }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for _, row in table.iterrows() %}
+                                            <tr>
+                                                {% for col in table.columns %}
+                                                    <td>{{ row[col] }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No tables found in the document</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save to Knowledge Base Modal -->
+<div class="modal fade" id="saveToKbModal" tabindex="-1" aria-labelledby="saveToKbModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="saveToKbModalLabel">Save to Knowledge Base</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/save_to_kb/{{ analysis_id }}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ filename.split('.')[0] }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tags" class="form-label">Tags (comma separated)</label>
+                        <input type="text" class="form-control" id="tags" name="tags" placeholder="e.g. report, finance, 2023">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Document</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize tabs
+    document.addEventListener('DOMContentLoaded', function() {
+        var tabEl = document.querySelector('#contentTabs button[data-bs-toggle="tab"]')
+        tabEl.addEventListener('shown.bs.tab', function (event) {
+            // do something...
+        })
+    });
+</script>
+{% endblock %}
