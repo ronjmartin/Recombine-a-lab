@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}About - PDF Analysis Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">About PDF Analysis Dashboard</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Project Overview</h5>
+        </div>
+        <div class="card-body">
+            <p>
+                PDF Analysis Dashboard is a comprehensive tool designed to extract, analyze, and store information from PDF documents.
+                Whether you need to extract text and tables, analyze sentiment, or identify key topics, this application provides
+                a streamlined workflow for working with PDF content.
+            </p>
+            <p>
+                The application includes a private offline knowledge base for storing analyzed documents, making it easy to review
+                and search through your collection of PDFs without having to re-analyze them.
+            </p>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Features & Capabilities</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>PDF Content Extraction</h6>
+                    <ul>
+                        <li>Full-text extraction with formatting preserved</li>
+                        <li>Table detection and extraction</li>
+                        <li>Structure preservation for better readability</li>
+                    </ul>
+                    
+                    <h6>Sentiment Analysis</h6>
+                    <ul>
+                        <li>Overall sentiment polarity detection</li>
+                        <li>Subjectivity assessment</li>
+                        <li>Visual sentiment representation</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Key Findings Extraction</h6>
+                    <ul>
+                        <li>Main topics identification</li>
+                        <li>Named entity recognition (people, organizations, locations, etc.)</li>
+                        <li>Document summarization</li>
+                    </ul>
+                    
+                    <h6>Knowledge Base</h6>
+                    <ul>
+                        <li>Document storage with metadata</li>
+                        <li>Full-text search capabilities</li>
+                        <li>Organization with tags and descriptions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Technology Stack</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <h6>Backend</h6>
+                    <ul>
+                        <li>Flask web framework</li>
+                        <li>SQLite database</li>
+                        <li>PyPDF2 & pdfplumber for PDF extraction</li>
+                        <li>Camelot for table extraction</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Analysis</h6>
+                    <ul>
+                        <li>NLTK for natural language processing</li>
+                        <li>TextBlob for sentiment analysis</li>
+                        <li>spaCy for entity recognition</li>
+                        <li>Pandas for data manipulation</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Frontend</h6>
+                    <ul>
+                        <li>Bootstrap 5 for responsive design</li>
+                        <li>Jinja2 templating</li>
+                        <li>Plotly for interactive visualizations</li>
+                        <li>JavaScript for interactive elements</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Privacy & Data Handling</h5>
+        </div>
+        <div class="card-body">
+            <p>
+                <strong>Local Processing:</strong> All document analysis happens locally on your machine. No data is sent to external servers.
+            </p>
+            <p>
+                <strong>Private Knowledge Base:</strong> The knowledge base is stored locally in a SQLite database, ensuring your documents
+                remain private and secure.
+            </p>
+            <p>
+                <strong>No Data Sharing:</strong> This application does not collect, share, or transmit your documents or analysis results.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

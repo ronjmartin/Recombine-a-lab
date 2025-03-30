@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}{{ document.title }} - Knowledge Base{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ document.title }}</h1>
+        <div>
+            <button class="btn btn-outline-danger" onclick="confirmDelete({{ document.id }}, '{{ document.title }}')">
+                <i class="bi bi-trash"></i> Delete Document
+            </button>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Document Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Original Filename:</strong> {{ document.original_filename }}</p>
+                    <p><strong>Upload Date:</strong> {{ document.upload_time }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Description:</strong> 
+                        {% if document.description %}
+                            {{ document.description }}
+                        {% else %}
+                            <span class="text-muted">No description provided</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Tags:</strong> 
+                        {% if document.tags %}
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for tag in document.tags %}
+                                    <span class="badge bg-secondary">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <span class="text-muted">No tags</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Sentiment Analysis</h5>
+                    <span class="badge bg-{{ 'success' if document.sentiment.polarity > 0 else 'danger' if document.sentiment.polarity < 0 else 'secondary' }}">
+                        {{ 'Positive' if document.sentiment.polarity > 0 else 'Negative' if document.sentiment.polarity < 0 else 'Neutral' }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Sentiment Score: {{ '%.2f'|format(document.sentiment.polarity) }}</h6>
+                        <div class="progress">
+                            <div class="progress-bar {{ 'bg-success' if document.sentiment.polarity > 0 else 'bg-danger' if document.sentiment.polarity < 0 else 'bg-secondary' }}" 
+                                 role="progressbar" 
+                                 style="width: {{ (document.sentiment.polarity + 1) * 50 }}%"
+                                 aria-valuenow="{{ (document.sentiment.polarity + 1) * 50 }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                        <small class="text-muted">(-1: Very Negative, 0: Neutral, 1: Very Positive)</small>
+                    </div>
+                    
+                    <div>
+                        <h6>Subjectivity: {{ '%.2f'|format(document.sentiment.subjectivity) }}</h6>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" 
+                                 role="progressbar" 
+                                 style="width: {{ document.sentiment.subjectivity * 100 }}%" 
+                                 aria-valuenow="{{ document.sentiment.subjectivity * 100 }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                        <small class="text-muted">(0: Very Objective, 1: Very Subjective)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Key Findings</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Key Topics</h6>
+                    <div class="mb-3">
+                        {% if document.key_findings.topics %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for topic in document.key_findings.topics %}
+                                    <span class="badge bg-primary">{{ topic }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No topics identified</p>
+                        {% endif %}
+                    </div>
+                    
+                    <h6>Key Entities</h6>
+                    <div class="mb-3">
+                        {% if document.key_findings.entities %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for entity in document.key_findings.entities %}
+                                    <span class="badge bg-secondary">{{ entity.text }} ({{ entity.label }})</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No entities identified</p>
+                        {% endif %}
+                    </div>
+                    
+                    <h6>Summary</h6>
+                    <div>
+                        {% if document.key_findings.summary %}
+                            <p>{{ document.key_findings.summary }}</p>
+                        {% else %}
+                            <p class="text-muted">No summary available</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="contentTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text-content" type="button" role="tab" aria-controls="text-content" aria-selected="true">
+                        Text Content
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tables-tab" data-bs-toggle="tab" data-bs-target="#tables-content" type="button" role="tab" aria-controls="tables-content" aria-selected="false">
+                        Tables
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="contentTabsContent">
+                <div class="tab-pane fade show active" id="text-content" role="tabpanel" aria-labelledby="text-tab">
+                    <div class="mb-3">
+                        <div class="text-content" style="max-height: 500px; overflow-y: auto; white-space: pre-wrap;">{{ document.text_content }}</div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tables-content" role="tabpanel" aria-labelledby="tables-tab">
+                    {% if document.tables %}
+                        {% for table in document.tables %}
+                            <div class="table-responsive mb-4">
+                                <h6>Table {{ loop.index }}</h6>
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            {% for col in table.columns %}
+                                                <th>{{ col }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for _, row in table.iterrows() %}
+                                            <tr>
+                                                {% for col in table.columns %}
+                                                    <td>{{ row[col] }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No tables found in the document</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete "<span id="deleteDocTitle"></span>"?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" action="/delete_document/0" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function confirmDelete(docId, docTitle) {
+        document.getElementById('deleteDocTitle').textContent = docTitle;
+        document.getElementById('deleteForm').action = `/delete_document/${docId}`;
+        
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        deleteModal.show();
+    }
+    
+    // Initialize tabs
+    document.addEventListener('DOMContentLoaded', function() {
+        var tabEl = document.querySelector('#contentTabs button[data-bs-toggle="tab"]')
+        tabEl.addEventListener('shown.bs.tab', function (event) {
+            // do something...
+        })
+    });
+</script>
+{% endblock %}

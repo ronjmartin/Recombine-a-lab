@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Home - PDF Analysis Dashboard{% endblock %}
+
+{% block content %}
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold">PDF Analysis Dashboard</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">
+            Upload, analyze, and store your PDF documents with our comprehensive analysis toolkit.
+        </p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="/upload" class="btn btn-primary btn-lg px-4 gap-3">
+                <i class="bi bi-upload"></i> Upload & Analyze PDF
+            </a>
+            <a href="/knowledge_base" class="btn btn-outline-secondary btn-lg px-4">
+                <i class="bi bi-database"></i> Knowledge Base
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container px-4 py-5">
+    <h2 class="pb-2 border-bottom">Features</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+        <div class="col d-flex align-items-start">
+            <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <i class="bi bi-file-text"></i>
+            </div>
+            <div>
+                <h3 class="fs-2">Text Extraction</h3>
+                <p>Extract and view the textual content of PDF files with formatting preserved.</p>
+            </div>
+        </div>
+        <div class="col d-flex align-items-start">
+            <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <i class="bi bi-table"></i>
+            </div>
+            <div>
+                <h3 class="fs-2">Table Extraction</h3>
+                <p>Identify and extract tables from PDFs with their structure intact.</p>
+            </div>
+        </div>
+        <div class="col d-flex align-items-start">
+            <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <i class="bi bi-emoji-smile"></i>
+            </div>
+            <div>
+                <h3 class="fs-2">Sentiment Analysis</h3>
+                <p>Analyze the emotional tone and subjectivity of document content.</p>
+            </div>
+        </div>
+        <div class="col d-flex align-items-start">
+            <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <i class="bi bi-lightbulb"></i>
+            </div>
+            <div>
+                <h3 class="fs-2">Key Findings</h3>
+                <p>Extract important entities, topics, and generate document summaries.</p>
+            </div>
+        </div>
+        <div class="col d-flex align-items-start">
+            <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <i class="bi bi-database"></i>
+            </div>
+            <div>
+                <h3 class="fs-2">Knowledge Base</h3>
+                <p>Store analyzed documents for future reference and searching.</p>
+            </div>
+        </div>
+        <div class="col d-flex align-items-start">
+            <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <i class="bi bi-graph-up"></i>
+            </div>
+            <div>
+                <h3 class="fs-2">Visualization</h3>
+                <p>Visualize data extracted from PDFs for better understanding.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
